@@ -2,13 +2,17 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate # Flyway owns the schema. Hibernate only validates
-    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: false
   flyway:
     enabled: true
   jackson:
     datatype:
       datetime:
         write-dates-as-timestamps: false
+
 jwt:
   secret-key: ${JWT_SECRET_KEY}
   expiration: 86400000
