@@ -38,9 +38,17 @@ public class OrganizationService {
     @Transactional(readOnly = true)
     public OrganizationResponse getOrganizationById(UUID organizationId) {
         Organization organization = organizationRepository.findByIdAndDeletedAtIsNull(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException("Organization not found with id " + organizationId));
+                .orElseThrow(() -> new OrganizationNotFoundException());
 
         return toOrganizationResponse(organization);
+    }
+
+    @Transactional(readOnly = true)
+    public Organization getOrganizationEntityById(UUID organizationId) {
+        Organization organization = organizationRepository.findByIdAndDeletedAtIsNull(organizationId)
+                .orElseThrow(() -> new OrganizationNotFoundException());
+
+        return organization;
     }
 
     @Transactional(readOnly = true)
@@ -76,7 +84,7 @@ public class OrganizationService {
     @Transactional
     public OrganizationResponse updateOrganization(UUID userId, UUID organizationId, UpdateOrganizationRequest updateOrganizationRequest) {
         Organization organization = organizationRepository.findByIdAndDeletedAtIsNull(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException("Organization not found with id " + organizationId));
+                .orElseThrow(() -> new OrganizationNotFoundException());
 
         membershipService.requireOwner(userId, organizationId);
 
@@ -100,7 +108,7 @@ public class OrganizationService {
     @Transactional
     public void deleteOrganization(UUID userId, UUID organizationId) {
         Organization organization = organizationRepository.findByIdAndDeletedAtIsNull(organizationId)
-                .orElseThrow(() -> new OrganizationNotFoundException("Organization not found with id " + organizationId));
+                .orElseThrow(() -> new OrganizationNotFoundException());
 
         membershipService.requireOwner(userId, organizationId);
 
