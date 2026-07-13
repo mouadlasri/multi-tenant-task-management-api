@@ -42,6 +42,10 @@ public class Membership {
         this.role = role;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public User getUser() {
         return user;
     }

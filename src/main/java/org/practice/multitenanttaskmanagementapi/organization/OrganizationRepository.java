@@ -3,7 +3,6 @@ package org.practice.multitenanttaskmanagementapi.organization;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -13,5 +12,5 @@ public interface OrganizationRepository extends JpaRepository<Organization, UUID
 
     Optional<Organization> findByIdAndDeletedAtIsNull(UUID organizationId);
 
-    Page<Organization> findAllAndDeletedAtIsNull(Pageable pageable);
+    Page<Organization> findAllByDeletedAtIsNull(Pageable pageable);
 }

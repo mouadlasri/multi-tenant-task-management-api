@@ -1,6 +1,5 @@
 package org.practice.multitenanttaskmanagementapi.organization;
 
-import jakarta.persistence.Entity;
 import org.practice.multitenanttaskmanagementapi.membership.Membership;
 import org.practice.multitenanttaskmanagementapi.membership.MembershipRepository;
 import org.practice.multitenanttaskmanagementapi.membership.MembershipRole;
@@ -46,7 +45,7 @@ public class OrganizationService {
 
     @Transactional(readOnly = true)
     public Page<OrganizationResponse> getAllOrganizations(Pageable pageable) {
-        Page<Organization> organizationPage = organizationRepository.findAllAndDeletedAtIsNull(pageable);
+        Page<Organization> organizationPage = organizationRepository.findAllByDeletedAtIsNull(pageable);
 
         Page<OrganizationResponse> organizationResponsePage = organizationPage.map(organization -> toOrganizationResponse(organization));
 
@@ -81,8 +80,14 @@ public class OrganizationService {
 
         membershipService.requireOwner(userId, organizationId);
 
-        if (updateOrganizationRequest.getName() != null) {
-            organization.setName(updateOrganizationRequest.getName());
+        String newName = updateOrganizationRequest.getName();
+
+        if (newName != null && !newName.equals(organization.getName())) {
+            if (organizationRepository.existsByNameAndDeletedAtIsNull(newName)) {
+                throw new OrganizationNameAlreadyExists("Invalid organization name.");
+            }
+
+            organization.setName(newName);
         }
 
         if (updateOrganizationRequest.getDescription() != null) {
