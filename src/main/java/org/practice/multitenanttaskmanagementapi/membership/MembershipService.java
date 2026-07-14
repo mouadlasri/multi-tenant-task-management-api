@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -65,8 +66,6 @@ public class MembershipService {
             throw new MembershipAlreadyExistsException();
         }
 
-        // (TODO: update delete user service method to soft-delete all user's memberships as well)
-
         User user = userRepository.findUserByIdAndDeletedAtIsNull(newMemberId).orElseThrow(() -> new UserNotFoundException());
         Organization organization = organizationRepository.findByIdAndDeletedAtIsNull(organizationId)
                 .orElseThrow(() -> new OrganizationNotFoundException());
@@ -111,6 +110,16 @@ public class MembershipService {
 
         membership.setDeletedAt(OffsetDateTime.now(ZoneOffset.UTC));
 
+    }
+
+    @Transactional
+    public void softDeleteAllMembershipsByUserId(UUID userId) {
+        List<Membership> membershipList = membershipRepository.findAllByUser_IdAndDeletedAtIsNull(userId);
+
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+        for (Membership membership : membershipList) {
+            membership.setDeletedAt(now);
+        }
     }
 
     @Transactional(readOnly = true)

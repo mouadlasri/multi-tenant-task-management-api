@@ -7,6 +7,9 @@ import org.practice.multitenanttaskmanagementapi.project.dto.CreateProjectReques
 import org.practice.multitenanttaskmanagementapi.project.dto.ProjectResponse;
 import org.practice.multitenanttaskmanagementapi.project.dto.UpdateProjectRequest;
 import org.practice.multitenanttaskmanagementapi.project.exception.ProjectNotFoundException;
+import org.practice.multitenanttaskmanagementapi.task.Task;
+import org.practice.multitenanttaskmanagementapi.task.TaskRepository;
+import org.practice.multitenanttaskmanagementapi.task.TaskService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,11 +25,13 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final MembershipService membershipService;
     private final OrganizationService organizationService;
+    private final TaskRepository taskRepository;
 
-    public ProjectService(ProjectRepository projectRepository, MembershipService membershipService, OrganizationService organizationService) {
+    public ProjectService(ProjectRepository projectRepository, MembershipService membershipService, OrganizationService organizationService, TaskRepository taskRepository) {
         this.projectRepository = projectRepository;
         this.membershipService = membershipService;
         this.organizationService = organizationService;
+        this.taskRepository = taskRepository;
     }
 
     @Transactional(readOnly = true)
@@ -102,9 +108,15 @@ public class ProjectService {
         Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(projectId, organizationId)
                 .orElseThrow(() -> new ProjectNotFoundException());
 
-        // TODO: all tasks should be deleted once the project they are assigned to is deleted
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
 
-        project.setDeletedAt(OffsetDateTime.now(ZoneOffset.UTC));
+        project.setDeletedAt(now);
+
+        List<Task> tasks = taskRepository.findAllByProject_IdAndDeletedAtIsNull(projectId);
+
+        for (Task task : tasks) {
+            task.setDeletedAt(now);
+        }
     }
 
     private ProjectResponse toProjectResponse(Project project) {

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -123,6 +124,17 @@ public class TaskService {
                 .orElseThrow(() -> new TaskNotFoundException());
 
         task.setDeletedAt(OffsetDateTime.now(ZoneOffset.UTC));
+    }
+
+    @Transactional
+    public void softDeleteAllTasksByProjectId(UUID projectId) {
+        List<Task> tasks = taskRepository.findAllByProject_IdAndDeletedAtIsNull(projectId);
+
+        OffsetDateTime now = OffsetDateTime.now(ZoneOffset.UTC);
+
+        for (Task task : tasks) {
+            task.setDeletedAt(now);
+        }
     }
 
 

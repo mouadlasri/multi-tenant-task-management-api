@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,4 +28,6 @@ public interface MembershipRepository extends JpaRepository<Membership, UUID> {
     Optional<Membership> findByIdAndOrganizationIdAndDeletedAtIsNull(UUID membershipId, UUID organizationId);
 
     long countByOrganization_IdAndRoleAndDeletedAtIsNull(UUID organizationId, MembershipRole role);
+
+    List<Membership> findAllByUser_IdAndDeletedAtIsNull(UUID userId);
 }
