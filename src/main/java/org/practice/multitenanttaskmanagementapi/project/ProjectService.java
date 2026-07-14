@@ -42,10 +42,20 @@ public class ProjectService {
     public ProjectResponse getProjectById(UUID userId, UUID organizationId, UUID projectId) {
         membershipService.requireMember(userId, organizationId);
 
-        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNull(projectId, organizationId)
+        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(projectId, organizationId)
                 .orElseThrow(() -> new ProjectNotFoundException());
 
         return toProjectResponse(project);
+    }
+
+    @Transactional(readOnly = true)
+    public Project getProjectEntityById(UUID userId, UUID organizationId, UUID projectId) {
+        membershipService.requireMember(userId, organizationId);
+
+        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(projectId, organizationId)
+                .orElseThrow(() -> new ProjectNotFoundException());
+
+        return project;
     }
 
     @Transactional
@@ -68,7 +78,7 @@ public class ProjectService {
     public ProjectResponse updateProject(UUID userId, UUID organizationId, UUID projectId, UpdateProjectRequest updateProjectRequest) {
         membershipService.requireOwnerOrAdmin(userId, organizationId);
 
-        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNull(projectId, organizationId)
+        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(projectId, organizationId)
                 .orElseThrow(() -> new ProjectNotFoundException());
 
         String name = updateProjectRequest.getName();
@@ -89,7 +99,7 @@ public class ProjectService {
     public void deleteProject(UUID userId, UUID organizationId, UUID projectId) {
         membershipService.requireOwnerOrAdmin(userId, organizationId);
 
-        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNull(projectId, organizationId)
+        Project project = projectRepository.findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(projectId, organizationId)
                 .orElseThrow(() -> new ProjectNotFoundException());
 
         // TODO: all tasks should be deleted once the project they are assigned to is deleted

@@ -1,6 +1,8 @@
 package org.practice.multitenanttaskmanagementapi.project.exception;
 
-public class ProjectNotFoundException extends RuntimeException {
+import org.practice.multitenanttaskmanagementapi.exception.ResourceNotFoundException;
+
+public class ProjectNotFoundException extends ResourceNotFoundException {
     public ProjectNotFoundException() {
         super("Project not found.");
     }

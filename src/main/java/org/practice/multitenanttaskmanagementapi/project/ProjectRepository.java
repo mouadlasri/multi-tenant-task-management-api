@@ -14,5 +14,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Optional<Project> findByIdAndDeletedAtIsNull(UUID projectId);
 
     @Query("SELECT p FROM Project p JOIN FETCH p.organization WHERE p.id = :projectId AND p.organization.id = :organizationId AND p.deletedAt IS NULL")
-    Optional<Project> findByIdAndOrganization_IdAndDeletedAtIsNull(UUID projectId, UUID organizationId);
+    Optional<Project> findByIdAndOrganization_IdAndDeletedAtIsNullWithOrganization(UUID projectId, UUID organizationId);
 }
