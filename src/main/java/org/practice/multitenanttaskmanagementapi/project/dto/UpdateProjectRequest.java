@@ -1,15 +1,16 @@
-package org.practice.multitenanttaskmanagementapi.organization.dto;
+package org.practice.multitenanttaskmanagementapi.project.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-public class UpdateOrganizationRequest {
-    @NotBlank
+public class UpdateProjectRequest {
     private String name;
+
     private String description;
 
-    public UpdateOrganizationRequest() {}
+    public UpdateProjectRequest() {}
 
-    public UpdateOrganizationRequest(String name, String description) {
+    public UpdateProjectRequest(String name, String description) {
         this.name = name;
         this.description = description;
     }
