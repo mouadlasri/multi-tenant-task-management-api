@@ -58,6 +58,17 @@ public class TaskService {
         return toTaskResponse(task);
     }
 
+    @Transactional(readOnly = true)
+    public Task getTaskEntityById(UUID userId, UUID organizationId, UUID projectId, UUID taskId) {
+        membershipService.requireMember(userId, organizationId);
+
+        projectService.getProjectEntityById(userId, organizationId, projectId);
+
+        Task task = taskRepository.findByIdAndProject_IdAndDeletedAtIsNull(taskId, projectId).orElseThrow(() -> new TaskNotFoundException());
+
+        return task;
+    }
+
     @Transactional
     public TaskResponse createTask(UUID userId, UUID organizationId, UUID projectId, CreateTaskRequest createTaskRequest) {
         membershipService.requireOwnerOrAdmin(userId, organizationId);
